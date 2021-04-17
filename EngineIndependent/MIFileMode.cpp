@@ -13,7 +13,15 @@ FMode::FMode(const char c) noexcept {
 	case in:
 		modeStr[0] = 'r'; break;
 	case out:
-		modeStr[0] = 'r'; modeStr[1] = '+'; break;
+		if (c & app) {
+			modeStr[0] = 'a'; break;
+		}
+		else if (c & ovw) {
+			modeStr[0] = 'w'; break;
+		}
+		else {
+			modeStr[0] = 'r'; modeStr[1] = '+'; break;
+		}
 	case in | out:
 		modeStr[0] = 'r'; modeStr[1] = '+'; break;
 	default://0

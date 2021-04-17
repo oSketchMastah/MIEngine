@@ -32,9 +32,16 @@ void inline String::Shift(const size_t offset) {
 	buff.SetSize(buff.Size() + offset);
 }
 
+bool String::NeedsResizeToAdd(size_t charsToAdd) {
+	return capacity <= buff.Size() + charsToAdd;
+}
+
 /*implicit treatment of a string as it's underlying buffer,
 	nothing external to a string object needs capacity data*/
 String::operator const Buffer& () const {
+	return buff;
+}
+String::operator const char* () const {
 	return buff;
 }
 
@@ -54,6 +61,7 @@ String::String() : capacity(0), buff() {
 
 }
 String::String(String&& str) : capacity(str.capacity), buff(std::move(str.buff)) { //copy constructors
+
 }
 String::String(const String& str) { //copy constructors
 	capacity = exp2Ceil(str.Size());
@@ -64,9 +72,12 @@ String::String(const Buffer& nbuff) {
 	capacity = exp2Ceil(nbuff.Size());
 	buff = std::move(Buffer(capacity, nbuff.c_str(), nbuff.Size()));
 }
+
 String::String(const char* str) : capacity(exp2Ceil(strlen(str))) {
 	buff = std::move(Buffer(capacity, str, strlen(str)));
 }
+
+
 String::~String() {
 }
 

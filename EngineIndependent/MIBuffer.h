@@ -7,6 +7,7 @@ namespace MI {
 	struct Buffer {
 		size_t size = 0;
 		char* pBuff = nullptr;
+		
 		Buffer(); //Uninitialized
 		Buffer(const int& cap); //Initialized with specified cap
 		Buffer(const int& cap, const char* str, size_t len);
@@ -21,6 +22,7 @@ namespace MI {
 		//Deletes this buffer and replaces it with one of the specified capacity
 		void Resize(const int& newCap);
 		//The cstring buffer data
+		operator const char* () const;
 		const char* c_str() const;
 		//Get a reference to the memory location (char*) holding the buffered data
 		char* RawMemory();

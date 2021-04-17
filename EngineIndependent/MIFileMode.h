@@ -12,7 +12,7 @@ namespace MI {
 		FMode(const char c) noexcept;
 		FMode(const FMode& c);
 
-		operator char* () noexcept { return modeStr; }
+		operator const char* () const noexcept { return modeStr; }
 		char modeStr [4] = "";
 	};
 

@@ -1,18 +1,23 @@
 #pragma once
 #include "MIBuffer.h"
 namespace MI {
+	class WideString; //make use of unicode
+	class FinalString; //Save memory with strings allocated in a special finalization stack
+
 	class String {
 		Buffer buff; //holds size and data
 		size_t capacity; //tracks allocated size for dynamics
 		void ResizeToFit(size_t numC);
 		void Shift(size_t numC);
 	public:
+		bool NeedsResizeToAdd( size_t charsToAdd);
 		size_t Size() const;
 		size_t Capacity() const; 
 		
 		/*implicit treatment of a string as it's underlying buffer,
 			nothing external to a string object needs capacity data*/
 		operator const Buffer&() const;
+		operator const char* () const;
 		Buffer& GetBuffer();
 
 		String();
@@ -20,6 +25,8 @@ namespace MI {
 		String(const String&);//copy constructors
 		String(const Buffer&);//copy constructors
 		String(const char*);
+		//constexpr String(const char arr[]);
+
 		~String();
 
 		const char* c_str() const;
@@ -43,18 +50,22 @@ namespace MI {
 		//append the buffer's data to the end of this string
 		void operator+=(const Buffer &);
 		//void operator+=(const String&);
-
-		//inline String&& operator+( const char* cstr);
-		//const String& operator+(const char*) const;
-		//String operator+(const char*); //
-		//String&& operator+(const String& temp); //string + copy lvalue string -> rvalue string
-		//String&& operator+(String&& temp); //string + moved rvalue string -> rvalue string
-
 		friend String operator+(String& left, String const& right);
 		friend String operator+(String&& left, String const& right);
-
 		friend String operator+(String& left, const char*);
 		friend String operator+(String&& left, const char*);
+
+		/**Finalizers - reduce memory usage by allocating string in special buffer, we then only need to
+			  reference the string at that location + get safe noexcept and const policies*/
+
+		//Copies all the data over to a buffer with just enough space for the data + null terminator
+		const FinalString& Finalize();
+		//Copies all the data over to a buffer with enough space to hold the given capacity (cap)
+		const FinalString& Finalize(size_t cap);
+
+
+		//converts this ascci string into a wide character string
+		const WideString& ToWide() const;
 
 	};
 	//String& operator+(String& left, String const& right);

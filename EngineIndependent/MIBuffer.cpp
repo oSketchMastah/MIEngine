@@ -40,7 +40,9 @@ Buffer::Buffer() : pBuff{ nullptr }, size{ 0 } {}
 		delete[] pBuff;
 		pBuff = newbuff;
 	}
-
+	Buffer::operator const char* () const {
+		return pBuff;
+	}
 	const char* Buffer::c_str() const { return pBuff; }
 	char* Buffer::RawMemory() { return pBuff; }
 

@@ -53,12 +53,14 @@ Logger::~Logger() {}
 
 void Logger::DoAssert(const bool predtv, const char* msg, const char* file, int line) {
 	if constexpr (ReportAssertions || WriteLogs) {
-		snprintf(pImpl->StaticAssertMsg__, sizeof(pImpl->StaticAssertMsg__), "Bad Assert %s - at %s %d", msg, file, line);
-		if constexpr (ReportAssertions) {
-			assert(0, pImpl->StaticAssertMsg__);
-		}
-		if constexpr (WriteLogs) {
-			pImpl->WriteLog(SeverityLevel::Error, pImpl->StaticAssertMsg__);
+		if (!predtv) {
+			snprintf(pImpl->StaticAssertMsg__, sizeof(pImpl->StaticAssertMsg__), "Bad Assert %s - at %s %d", msg, file, line);
+			if constexpr (ReportAssertions) {
+				assert(0, pImpl->StaticAssertMsg__);
+			}
+			if constexpr (WriteLogs) {
+				pImpl->WriteLog(SeverityLevel::Error, pImpl->StaticAssertMsg__);
+			}
 		}
 	}
 }

@@ -4,7 +4,7 @@
 namespace MI {
 	//SeverityLevel helps in conditional warnings, for example:  some severity level might serve as
 	//		a boundary for what gets reported in early development vs pre-release (ex. missing art)
-	struct SeverityLevel : Comparable<SeverityLevel, char> {
+	struct SeverityLevel : Comparable<char> {
 		static constexpr char Marker = 0; //Just logged to make sure things are happening
 		static constexpr char Info = 51; //Information for when you need to see more about what's happening
 		static constexpr char WarningWeak = 102; //a non-critical warning, may be shown in release builds

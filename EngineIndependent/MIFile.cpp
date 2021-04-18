@@ -49,8 +49,15 @@ struct File::Impl {
 	void Open(const char* filename, const FMode& openmode = DefaultFileMode) {
 		m_filename = filename;
 		m_pFile = fopen(filename, FMode(openmode));
-		if (m_pFile == nullptr && openmode[0] == DefaultFileMode[0] && openmode[1] == DefaultFileMode[1]) { //(r+ does NOT open a nonexistent file)
-			m_pFile = fopen(filename, FMode(FMode::out | FMode::in | FMode::ovw)); //fix for a common error, forgetting to specify ovw flag
+		if (m_pFile == nullptr) {
+			if (openmode[0] == DefaultFileMode[0]) { //starts with 'r'
+				if (openmode[1] == DefaultFileMode[1]) {//if '+' specified, but file does not exist, we assume we want creation
+					m_pFile = fopen(filename, FMode(FMode::out | FMode::in | FMode::ovw));
+				}
+				else {
+					DoSevAssertMsg(SeverityLevel::WarningStrong,"The file " + m_filename + " does not exist");
+				}
+			}
 		}
 	}
 
@@ -66,7 +73,7 @@ struct File::Impl {
 
 	void FlushOutput() {
 		m_pFile = fopen(m_filename, mode); //incase inactivity causes it to close automatically
-		fwrite(__programbuf.RawMemory(), 1, __programbuf.size + 1, m_pFile); //transfer program buffer to internal
+		fwrite(__programbuf.RawMemory(), 1, __programbuf.Size(), m_pFile); //transfer program buffer to internal
 		fflush(m_pFile); //flush internal buffer to character device
 		__internalbuf.SetSize(0); //update the size of internal Buffer ourselves
 	}
@@ -110,7 +117,6 @@ File::~File() {
 
 //opens a new file with the specified mode, releasing previous file if necessary
 void File::Open(const char* filename, const FMode& newmode) { //buflen
-	pImpl->m_filename = filename;
 	if (pImpl->m_pFile) { 
 		fclose(pImpl->m_pFile); 
 	} //close the current file if necessary
@@ -119,16 +125,19 @@ void File::Open(const char* filename, const FMode& newmode) { //buflen
 }
 
 void File::Close(bool outremaining) {
-	fwrite(pImpl->__programbuf, 1, pImpl->__programbuf.size, pImpl->m_pFile);
+	if (outremaining) {
+		fwrite(pImpl->__programbuf, 1, pImpl->__programbuf.Size(), pImpl->m_pFile);
+	}
 	fflush(pImpl->m_pFile);
 	fclose(pImpl->m_pFile);
+	//pImpl->m_pFile = nullptr;
 }
 
 void File::Write(const Buffer& data) {
 	if (pImpl->NeedsFlushToAdd(data.Size())) {
 		pImpl->FlushOutput(); //flushes our buffer to the file
 	}
-	pImpl->__internalbuf.AddEnd(data.c_str(), data.Size());
+	pImpl->__internalbuf.AddEnd(data, data.Size());
 }
 
 void File::WriteLine(const Buffer& data, const char *lineEnd) {
@@ -136,7 +145,7 @@ void File::WriteLine(const Buffer& data, const char *lineEnd) {
 	if (pImpl->NeedsFlushToAdd(data.Size() + endlen)) {
 		pImpl->FlushOutput(); //flushes our buffer to the file
 	}
-	pImpl->__programbuf.AddEnd(data.c_str(), data.Size());
+	pImpl->__programbuf.AddEnd(data, data.Size());
 	pImpl->__programbuf.AddEnd(lineEnd, endlen);
 }
 void File::WriteLine(const char* data, const char* lineEnd) {
@@ -160,11 +169,11 @@ void File::Write(const char* data, const size_t size) {
 }
 
 bool File::Read(Buffer& mbuff, size_t readcap) {
-	return pImpl->Read(mbuff, readcap);
+	return pImpl->Read(mbuff, readcap - 1);
 }
 
 bool File::Read(String& str) {
-	return pImpl->Read(str.GetBuffer(), str.Capacity());
+	return pImpl->Read(str.GetBuffer(), str.Capacity() - 1);
 }
 
 size_t File::ProgramBufferCapacity() const {
@@ -172,7 +181,7 @@ size_t File::ProgramBufferCapacity() const {
 }
 
 Buffer& File::Read() {
-	pImpl->Read(pImpl->__programbuf, pImpl->__programbufCap);
+	pImpl->Read(pImpl->__programbuf, pImpl->__programbufCap - 1);
 	return pImpl->__programbuf;
 }
 

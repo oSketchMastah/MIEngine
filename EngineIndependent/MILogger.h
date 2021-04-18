@@ -1,14 +1,25 @@
 #pragma once
 #include "MIUniquePtr.h"
 #include "MIComparable.h"
-//SeverityLevel helps to
 namespace MI {
+	//SeverityLevel helps in conditional warnings, for example:  some severity level might serve as
+	//		a boundary for what gets reported in early development vs pre-release (ex. missing art)
 	struct SeverityLevel : Comparable<SeverityLevel, char> {
 		static constexpr char Marker = 0; //Just logged to make sure things are happening
-		static constexpr char Info = 1; //Information for when you need to see more about what's happening
-		static constexpr char Warning = 2; //something bad
-		static constexpr char Error = 3; //worse than warnings
-		static constexpr char Deadly = 4; //Something terrible has happened
+		static constexpr char Info = 51; //Information for when you need to see more about what's happening
+		static constexpr char WarningWeak = 102; //a non-critical warning, may be shown in release builds
+		static constexpr char WarningStrong = 153; //something bad, probably worth being reported in a warning log
+		static constexpr char Error = 204; //worse than warnings, critical errors that need attention
+		static constexpr char Deadly = 255; //Something terrible has happened
+
+#ifdef _DEBUG
+		static constexpr char MinAssertLevel = WarningWeak;
+#elif NDEBUG
+		static constexpr char MinAssertLevel = WarningWeak;
+#else
+#error make sure a MinAssertLevel is setup in MILogger.h
+#endif
+
 		SeverityLevel(char);
 	};
 
@@ -16,7 +27,7 @@ namespace MI {
 	can be used to send log errors, get data for fixme emails, etc. */
 	struct Logger {
 		~Logger();
-		//configure these constexpr's if you want something different / add more & wrap checks around function body
+		//configure these constexpr's if you want something different / add more & wrap checks around function bodies
 		static constexpr bool ReportAssertions = true;
 		static constexpr bool WriteLogs = false;
 		//A macro of equivalent name calls these, giving the actual file and line to the logger

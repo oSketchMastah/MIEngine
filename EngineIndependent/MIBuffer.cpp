@@ -6,28 +6,34 @@
 #include <iostream>
 
 using namespace MI;
-Buffer::Buffer() : pBuff{ nullptr }, size{ 0 } {}
+Buffer::Buffer() : buff{ nullptr }, size{ 0 } {}
 
-	Buffer::Buffer(const int& cap) : pBuff{ new char[cap] {} } {
+	Buffer::Buffer(const int& cap) : buff{ new char[cap] {} } {
 	}
-	Buffer::Buffer(const int& cap, const char* str, size_t len) : pBuff{ new char[cap] {} } {
-		strcpy(pBuff, len, str);
+	Buffer::Buffer(const int& cap, const char* str, size_t len) : buff{ new char[cap] {} } {
+		strcpy(buff, len, str);
 		size = len;
 	}
-	Buffer::Buffer(Buffer&& nbuff) : pBuff{ nbuff.pBuff }, size{ nbuff.size } {
-		nbuff.pBuff = nullptr;
+	Buffer::Buffer(Buffer&& nbuff) : buff{ nbuff.buff }, size{ nbuff.size } {
+		nbuff.buff = nullptr;
 		nbuff.size = 0;
 	}
 	Buffer::~Buffer() {
-		if (pBuff) { delete[] pBuff; }
+		if (buff) { delete[] buff; }
 	}
-	void Buffer::SetSize(const int len) { size = len; *(pBuff + size) = '\0'; }
+
+	Buffer& Buffer::Get() {
+		return *this;
+	}
+	void Buffer::SetSize(const int len) { size = len; *(buff + size) = '\0'; }
 
 	int Buffer::Size() const noexcept { return size; }
 
 	void Buffer::Clear() {
-		size = 0;
-		*pBuff = '\0';
+		if (buff) {
+			size = 0;
+			*buff = '\0';
+		}
 	}
 
 	void Buffer::Resize(const int& newCap) {
@@ -36,18 +42,19 @@ Buffer::Buffer() : pBuff{ nullptr }, size{ 0 } {}
 			AssertMsg(0, "bad allocation");
 			return; //error
 		}
-		strcpy(newbuff, size, pBuff);
-		delete[] pBuff;
-		pBuff = newbuff;
+		strcpy(newbuff, size, buff);
+		delete[] buff;
+		buff = newbuff;
 	}
 	Buffer::operator const char* () const {
-		return pBuff;
+		return buff;
 	}
-	const char* Buffer::c_str() const { return pBuff; }
-	char* Buffer::RawMemory() { return pBuff; }
+	const char* Buffer::c_str() const { return buff; }
+
+	char* Buffer::RawMemory() { return buff; }
 
 	const void Buffer::AddEnd(const char* data, int writelen) {
-		char* endBuff = pBuff + size;
+		char* endBuff = buff + size;
 		size += writelen;
 		for (; writelen > 0; writelen--, endBuff++, data++) {
 			*endBuff = *data;
@@ -55,34 +62,32 @@ Buffer::Buffer() : pBuff{ nullptr }, size{ 0 } {}
 		*endBuff = '\0';
 	}
 
-	void Buffer::operator=(const char* str) {
+	Buffer& Buffer::operator=(const Buffer& other) {
 		Clear();
-		AddEnd(str, strlen(str));
+		AddEnd(other.buff, other.size);
+		return *this;
 	}
 
-	void Buffer::operator=(const Buffer& buff) {
-		Clear();
-		AddEnd(buff.pBuff, buff.size);
+	Buffer& Buffer::operator=(Buffer&& other) {
+		Swap(buff, other.buff);
+		Swap(size, other.size);
+		return *this;
 	}
 
-	void Buffer::operator=(Buffer&& buff) {
-		Swap(pBuff, buff.pBuff);
-		Swap(size, buff.size);
-	}
-
-	bool Buffer::operator==(const Buffer& other) const{
+	bool Buffer::operator==(const Buffer& other) const {
 		if (this->size != other.size) {
 			return false;
 		}
 		else {
 			for (int i = 0; i < size; i++) {
-				if (*(pBuff + i) != *(other.pBuff + i)) {
+				if (*(buff + i) != *(other.buff + i)) {
 					return false;
 				}
 			}
 		}
 		return true;
 	}
+
 	bool Buffer::operator!=(const Buffer& other) const {
 		return !(*this == other);
 	}
@@ -94,10 +99,10 @@ Buffer::Buffer() : pBuff{ nullptr }, size{ 0 } {}
 	bool Buffer::operator<(const Buffer& other) const {
 		int i = 0;
 		for (; i < Minimum( size, other.size ); i++) {
-			if (*(pBuff + i) < *(other.pBuff + i)) {
+			if (*(buff + i) < *(other.buff + i)) {
 				return true;
 			}
-			else if (*(pBuff + i) > *(other.pBuff + i)) {
+			else if (*(buff + i) > *(other.buff + i)) {
 				return false;
 			}
 		}
@@ -107,10 +112,10 @@ Buffer::Buffer() : pBuff{ nullptr }, size{ 0 } {}
 	bool Buffer::operator>(const Buffer& other) const {
 		int i = 0;
 		for (; i < Minimum(size, other.size); i++) {
-			if (*(pBuff + i) > *(other.pBuff + i)) {
+			if (*(buff + i) > *(other.buff + i)) {
 				return true;
 			}
-			else if (*(pBuff + i) < *(other.pBuff + i)) {
+			else if (*(buff + i) < *(other.buff + i)) {
 				return false;
 			}
 		}
@@ -120,10 +125,10 @@ Buffer::Buffer() : pBuff{ nullptr }, size{ 0 } {}
 	bool Buffer::operator<=(const Buffer& other) const {
 		int i = 0;
 		for (; i < Minimum(size, other.size); i++) {
-			if (*(pBuff + i) < *(other.pBuff + i)) {
+			if (*(buff + i) < *(other.buff + i)) {
 				return true;
 			}
-			else if (*(pBuff + i) > *(other.pBuff + i)) {
+			else if (*(buff + i) > *(other.buff + i)) {
 				return false;
 			}
 		}
@@ -133,10 +138,10 @@ Buffer::Buffer() : pBuff{ nullptr }, size{ 0 } {}
 	bool Buffer::operator>=(const Buffer& other) const {
 		int i = 0;
 		for (; i < Minimum(size, other.size); i++) {
-			if (*(pBuff + i) < *(other.pBuff + i)) {
+			if (*(buff + i) > *(other.buff + i)) {
 				return true;
 			}
-			else if (*(pBuff + i) > *(other.pBuff + i)) {
+			else if (*(buff + i) < *(other.buff + i)) {
 				return false;
 			}
 		}
@@ -144,10 +149,10 @@ Buffer::Buffer() : pBuff{ nullptr }, size{ 0 } {}
 	}
 
 	void Buffer::WriteTo(FILE* file) {
-		Assert(size == fwrite(pBuff, 1, size, file));
+		Assert(size == fwrite(buff, 1, size, file));
 		Clear();
 	}
 
 	size_t Buffer::ReadFrom(FILE* file, size_t maxtoread) {
-		return fread(pBuff, 1, maxtoread, file);
+		return fread(buff, 1, maxtoread, file);
 	}

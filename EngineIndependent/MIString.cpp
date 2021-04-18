@@ -7,46 +7,38 @@
 
 using namespace MI;
 
-size_t String::Size() const {
-	return buff.Size();
-}
-size_t String::Capacity() const {
+size_t String::Capacity() const noexcept {
 	return capacity;
 }
 
+
 void String::ResizeToFit(const size_t total) {
 	size_t newsize = (capacity != 0) ? 2 * capacity : 1;
-	for (; newsize < total; newsize *= 2) {
+	for (; newsize <= total; newsize *= 2) {
 		continue;//needs resize
 	}
-
-	buff.Resize(newsize);
+	Buffer::Resize(newsize);
+	//buff.Resize(newsize);
 	this->capacity = newsize;
 }
 
 void inline String::Shift(const size_t offset) {
-	char* pc = buff.RawMemory() + buff.Size() + offset;
-	for (; pc != buff.RawMemory() + offset ; pc--) {
+	char* pc = Buffer::RawMemory() + Buffer::Size() + offset;
+	for (; pc != Buffer::RawMemory() + offset ; pc--) {
 		*pc = *(pc - offset);
 	}
-	buff.SetSize(buff.Size() + offset);
+	Buffer::SetSize(Buffer::Size() + offset);
 }
 
 bool String::NeedsResizeToAdd(size_t charsToAdd) {
-	return capacity <= buff.Size() + charsToAdd;
+	return capacity <= Buffer::Size() + charsToAdd;
 }
 
 /*implicit treatment of a string as it's underlying buffer,
 	nothing external to a string object needs capacity data*/
-String::operator const Buffer& () const {
-	return buff;
-}
-String::operator const char* () const {
-	return buff;
-}
 
 Buffer& String::GetBuffer() {
-	return buff;
+	return Buffer::Get();
 }
 template <typename T>
 T exp2Ceil(T num) {
@@ -57,87 +49,100 @@ T exp2Ceil(T num) {
 	return (i != 0) ? (1 << i) : 0;
 }
 
-String::String() : capacity(0), buff() {
+String::String() : capacity(0), Buffer() {
 
 }
-String::String(String&& str) : capacity(str.capacity), buff(std::move(str.buff)) { //copy constructors
+
+String::String(String&& str) : capacity(str.capacity), Buffer(std::move(str.GetBuffer())) { //copy constructors
 
 }
 String::String(const String& str) { //copy constructors
 	capacity = exp2Ceil(str.Size());
-	buff = std::move(Buffer(capacity, str.c_str(), str.Size()));
+	Buffer::Get() = std::move(Buffer(capacity, str, str.Size()));
 }
 
 String::String(const Buffer& nbuff) {
 	capacity = exp2Ceil(nbuff.Size());
-	buff = std::move(Buffer(capacity, nbuff.c_str(), nbuff.Size()));
+	Buffer::Get() = std::move(Buffer(capacity, nbuff, nbuff.Size()));
 }
 
 String::String(const char* str) : capacity(exp2Ceil(strlen(str))) {
-	buff = std::move(Buffer(capacity, str, strlen(str)));
+	Buffer::Get() = std::move(Buffer(capacity, str, strlen(str)));
 }
 
 
 String::~String() {
 }
 
-const char* String::c_str() const {
-	return buff.c_str();
-}
 #include <iostream>
 
 //Append a single character to the end, pls try and add maximal amounts.
-void String::operator=(char c) {
-	if (capacity < 1) {
+String& String::operator=(char c) {
+	if (capacity <= 1) {
 		ResizeToFit(1);
 	}
-	buff.Clear();
-	buff.AddEnd(&c, 1);
+	Buffer::Clear();
+	Buffer::AddEnd(&c, 1);
+	return *this;
 }
 //Append the cstring to the end of this string
-void String::operator=(const char* str) {
+String& String::operator=(const char* str) {
 	const int len = strlen(str);
-	if (capacity < len) {
+	if (capacity <= len) {
 		ResizeToFit(len);
 	}
-	buff.Clear();
-	buff.AddEnd(str, len);
+	Buffer::Clear();
+	Buffer::AddEnd(str, len);
+	return *this;
 }
 //append the buffer's data to the end of this string
-void String::operator=(const Buffer& nbuff) {
-	if (capacity < nbuff.Size()) {
+String& String::operator=(const Buffer& nbuff) {
+	if (capacity <= nbuff.Size()) {
 		ResizeToFit(nbuff.Size());
 	}
-	buff.Clear();
-	buff.AddEnd(nbuff.c_str(), nbuff.size);
+	Buffer::Clear();
+	Buffer::AddEnd(nbuff, nbuff.Size());
+	return *this;
+}
+
+//append the buffer's data to the end of this string
+String& String::operator=(const String& other) {
+	if (capacity <= other.Size()) {
+		ResizeToFit(other.Size());
+	}
+	Buffer::Clear();
+	Buffer::AddEnd(other, other.Size());
+	return *this;
 }
 //
-void String::operator=(String&& nstr) {
-	Swap(buff, nstr.buff);
+String& String::operator=(String&& nstr) noexcept {
+	Swap(GetBuffer(), nstr.GetBuffer());
 	Swap(capacity, nstr.capacity);
+	return *this;
 }
+
 
 //Append a single character to the end, pls try and add maximal amounts.
 void String::operator+=(const char c) {
-	if (this->capacity < this->Size() + 1) {//needs resize
+	if (this->capacity <= this->Size()) {//needs resize
 		ResizeToFit(this->Size() + 1);
 	}
-	buff.AddEnd(&c, 1);
+	Buffer::AddEnd(&c, 1);
 }
 //Append the cstring to the end of this string
 void String::operator+=(const char* str) {
 	const int len = strlen(str);
-	if (this->capacity < this->Size() + len) {//needs resize
+	if (this->capacity <= this->Size() + len) {//needs resize
 		ResizeToFit(this->Size() + len);
 	}
-	buff.AddEnd(str, len);
+	Buffer::AddEnd(str, len);
 }
 //append the buffer's data to the end of this string
 void String::operator+=(const Buffer& nbuff) {
-	if (this->capacity < this->Size() + nbuff.Size()) {//needs resize
+	if (this->capacity <= this->Size() + nbuff.Size()) {//needs resize
 		ResizeToFit(this->Size() + nbuff.Size());
 	}
-	buff.AddEnd(nbuff.c_str(), nbuff.Size());
+	Buffer::AddEnd(nbuff, nbuff.Size());
 }
 /*
 void String::operator+=(const String& str) {
@@ -184,39 +189,39 @@ void String::operator+=(const String& str) {
 	return std::move(*this);
 }*/
 
-String MI::operator+(String& left, String const& right) {
+String MI::operator+(const String& left, String const& right) {
 	String newstr(left);
-	if (newstr.Capacity() < left.Size() + right.Size()) { //use other buffer if it's bigger
-		newstr.ResizeToFit(left.buff.size + right.Size());
+	if (newstr.Capacity() <= left.Size() + right.Size()) { //use other buffer if it's bigger
+		newstr.ResizeToFit(left.Size() + right.Size());
 	}
-	newstr.buff.AddEnd(right.c_str(), right.Size());
+	newstr.AddEnd(right, right.Size());
 	return std::move(newstr);
 }
 
 String MI::operator+(String&& left, String const& right) {
-	if (left.Capacity() < left.Size() + right.Size()) { //use other buffer if it's bigger
-		left.ResizeToFit(left.buff.size + right.Size());
+	if (left.Capacity() <= left.Size() + right.Size()) { //use other buffer if it's bigger
+		left.ResizeToFit(left.Size() + right.Size());
 	}
-	left.buff.AddEnd(right.c_str(), right.Size());
+	left.AddEnd(right, right.Size());
 	return std::move(left);
 }
 
-String MI::operator+(String& left, const char* right) {
+String MI::operator+(const String& left, const char* right) {
 	String newstr(left);
 	int rlen = strlen(right);
-	if (newstr.Capacity() < left.Size() + rlen) { //use other buffer if it's bigger
-		newstr.ResizeToFit(left.buff.size + rlen);
+	if (newstr.Capacity() <= left.Size() + rlen) { //use other buffer if it's bigger
+		newstr.ResizeToFit(left.Size() + rlen);
 	}
-	newstr.buff.AddEnd(right, rlen);
+	newstr.AddEnd(right, rlen);
 	return std::move(newstr);
 }
 
 String MI::operator+(String&& left, const char* right) {
 	int rlen = strlen(right);
-	if (left.Capacity() < left.Size() + rlen) { //use other buffer if it's bigger
-		left.ResizeToFit(left.buff.size + rlen);
+	if (left.Capacity() <= left.Size() + rlen) { //use other buffer if it's bigger
+		left.ResizeToFit(left.Size() + rlen);
 	}
-	left.buff.AddEnd(right, rlen);
+	left.AddEnd(right, rlen);
 	return std::move(left);
 }
 

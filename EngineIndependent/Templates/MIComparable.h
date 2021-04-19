@@ -1,6 +1,6 @@
 #pragma once
-/*give a class type, and a basic type, using CRTP this signs up this class
-to be comparable amongst itself using a type T to which it delegates for comparisons*/
+/*give a basic type, deriving from this class makes it comparable against a type T to which it delegates
+*	for comparisons. This is only really intended for structures that need quick comparison functionality*/
 namespace MI {
 	template<typename T>
 	struct Comparable {

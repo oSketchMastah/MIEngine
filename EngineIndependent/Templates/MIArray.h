@@ -11,6 +11,8 @@ namespace MI {
 		Array() {}
 		~Array() {}
 
+		void Clear() { m_size = 0; }
+
 		size_t Size() { return m_size; }
 
 		void Shift(int index, const int offset = 1) {
@@ -33,6 +35,10 @@ namespace MI {
 		void inline Insert(const T& elm, const int index) {
 			Shift(index, 1);
 			m_arr[index] = elm;
+		}
+
+		T& Back() {
+			return m_arr[m_size - 1];
 		}
 
 		const T& operator[](int index) const { return m_arr[index]; }

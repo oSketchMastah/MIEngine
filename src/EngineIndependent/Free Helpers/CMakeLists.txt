@@ -1,0 +1,6 @@
+SET(MREL "${MREL}/Free Helpers")
+
+list(APPEND SOURCE_EXE ${MREL}/MIStringUtils.cpp)
+
+SET(SOURCE_EXE ${SOURCE_EXE} PARENT_SCOPE)
+

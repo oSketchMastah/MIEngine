@@ -1,0 +1,24 @@
+
+language: cpp
+jobs:
+  include:
+    - os: linux
+      arch: arm64
+      env: OS=arm64_linux
+    - os: linux
+      dist: ubuntu
+      arch: amd64
+      env: OS=amd64_linux
+    - os: windows
+      arch: amd64
+      env: OS=windows
+
+branches:
+  only:
+    - main
+
+script:
+    - cd scripts
+    - if [ "$TRAVIS_OS_NAME" = "windows" ]; then cd WIN && call CompileNTest  ; fi
+    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then cd LINUX && chmod u+x CompileNTest && ./CompileNTest; fi
+    - if [ "$TRAVIS_OS_NAME" = "amd64_linux" ]; then cd LINUX && chmod u+x CompileNTest && ./CompileNTest; fi

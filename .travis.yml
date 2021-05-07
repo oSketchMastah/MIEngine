@@ -19,5 +19,5 @@ branches:
 script:
     - cd scripts
     - if [ "$TRAVIS_OS_NAME" = "windows" ]; then cd WIN && call CompileNTest  ; fi
-    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then cd LINUX && ./CompileNTest; fi
-    - if [ "$TRAVIS_OS_NAME" = "amd64_linux" ]; then cd LINUX && ./CompileNTest; fi
+    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then cd LINUX && chmod u+x CompileNTest && ./CompileNTest; fi
+    - if [ "$TRAVIS_OS_NAME" = "amd64_linux" ]; then cd LINUX && chmod u+x CompileNTest && ./CompileNTest; fi

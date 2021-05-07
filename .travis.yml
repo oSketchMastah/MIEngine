@@ -20,6 +20,6 @@ script:
     - cd scripts
     - if [[ ${TRAVIS_OS_NAME} == "windows" ]]; then
         cd WIN && call CompileNTest
-      else
+    -  else
         cd LINUX && ./CompileNTest
-      fi
+    -  fi

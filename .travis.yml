@@ -22,4 +22,3 @@ script:
       else
         cd LINUX && ./CompileNTest
       fi
-     

@@ -3,6 +3,8 @@
 cd ../..
 
 mkdir build
+
+echo ${PWD}
 cmake -S . -B build
 
 cd build

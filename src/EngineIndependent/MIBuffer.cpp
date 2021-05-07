@@ -88,6 +88,15 @@ Buffer::Buffer() : buff{ nullptr }, size{ 0 } {}
 		return true;
 	}
 
+	bool Buffer::operator==(const char* other) const {
+		for (int i = 0; i < size; i++, other++) {
+			if (*other == '\0' || *(buff + i) != *other) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	bool Buffer::operator!=(const Buffer& other) const {
 		return !(*this == other);
 	}

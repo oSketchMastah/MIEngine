@@ -1,4 +1,5 @@
 # MIEngine
+[![CMake Build and Test](https://github.com/oSketchMastah/MIEngine/actions/workflows/cmake.yml/badge.svg)](https://github.com/oSketchMastah/MIEngine/actions/workflows/cmake.yml)
 
 A collection of types and C++ code that helps.
 

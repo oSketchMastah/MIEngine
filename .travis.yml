@@ -18,7 +18,9 @@ branches:
 script:
     - cd scripts
     - if [[ ${TRAVIS_OS_NAME} == "windows" ]]; then
-        cd WIN && call CompileNTest.bat
-      else
-        cd LINUX && ./CompileNTest
-      fi
+        - cd WIN
+        - call CompileNTest.bat
+    -  else
+        - cd LINUX
+        - ./CompileNTest
+    -  fi

@@ -3,5 +3,8 @@
 cd ../..
 
 cmake -S . -B build
+
 cd build
-make && ./$1
+
+make && ctest -VV
+

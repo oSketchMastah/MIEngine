@@ -51,6 +51,13 @@ namespace MI {
 		bool operator<=(const Buffer& other) const;
 		bool operator>=(const Buffer& other) const;
 
+		bool operator==(const char* other) const;
+		bool operator!=(const char* other) const;
+		bool operator<(const char* other) const;
+		bool operator>(const char* other) const;
+		bool operator<=(const char* other) const;
+		bool operator>=(const char* other) const;
+
 		void WriteTo(FILE* file);
 		size_t ReadFrom(FILE* file, size_t bytecap);
 	};

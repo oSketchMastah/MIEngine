@@ -16,4 +16,4 @@ To run the test in main.cpp yourself:
 # On Windows
   2. Go to MIEngines scripts directory, to the WIN subdirectory, and run CompileNRun.bat.   
       Note: you may need to adjust the path to the cmake executable (to run cmake), and/or vcvarsall.bat (for msbuild to compile the visual studio solution)
-  3. If you want to deal with the code in visual studio, go to the bin subdirectory of MIEngine, the .sln should be put there by cmake.
+  3. If you want to deal with the code in visual studio, go to the build subdirectory created in MIEngine, the .sln should be put there by cmake.

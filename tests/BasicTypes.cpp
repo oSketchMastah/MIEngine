@@ -7,8 +7,9 @@
 #include "MIFile.h"
 
 #include "MILogicSequence.h"
+#include "MITokenSimilarityParser.h"
 #include "MIDetectionTests.h"
-
+#include <cstring>
 #include <iostream>
 
 using namespace MI;
@@ -24,7 +25,7 @@ bool Test();
 
 template <>
 bool Test<String>() {
-
+	fprintf(stdout, "Beginning String test...\n");
 	//Test Comparisons
 	String l1 = "a";
 	String b1 = "b";
@@ -50,6 +51,7 @@ bool Test<String>() {
 
 template <>
 bool Test<Vector<char>>() {
+	fprintf(stdout, "Beginning Vector test...\n");
 	Vector<char> v;
 	v.AddEnd('c');
 	DISPROVE_CHECK(v[0] == 'c')
@@ -60,6 +62,7 @@ bool Test<Vector<char>>() {
 
 template <>
 bool Test<Array<int, 10>>() {
+	fprintf(stdout, "Beginning Array test...\n");
 	Array<int, 10> arr;
 	arr.AddEnd(1);
 	arr.AddEnd(2);
@@ -73,6 +76,7 @@ bool Test<Array<int, 10>>() {
 
 template <>
 bool Test<ArrayMap<10, int, String>>() {
+	fprintf(stdout, "Beginning ArrayMap test...\n");
 	ArrayMap<10, int, String> narr;
 	narr.Add(1, "hello");
 	narr.Add(2, "my");
@@ -88,6 +92,7 @@ bool Test<ArrayMap<10, int, String>>() {
 
 template <>
 bool Test<File>() {
+	fprintf(stdout, "Beginning File test...\n");
 File mf;
 	mf.Open("NEWfile.txt", FMode::out);
 	mf.WriteLine("bruh");
@@ -121,6 +126,7 @@ bool lessThan10(int k) { return k < 10; };
 
 template <>
 bool Test<LogicSequence<int, 10>>() {
+	fprintf(stdout, "Beginning LogicSequence test...\n");
 	LogicSequence<int, 10> ls;
 	ls.StartTrue(1);
 	ls.AndNew(7);
@@ -132,16 +138,51 @@ bool Test<LogicSequence<int, 10>>() {
 	return true;
 }
 
+template <>
+bool Test<TokenParser>() {
+	fprintf(stdout, "Beginning TokenParser test...\n");
+	TokenParser tp;
+	//teststr will be changed during test, but should not appear any different afterwards.
+	String teststr = "something ( other )";
+	const String ctrl(teststr);
+	tp.BeginParsing(teststr.RawMemory());
+	DISPROVE_CHECK(strcmp(tp.NextToken(), "something") == 0)
+	DISPROVE_CHECK(strcmp(tp.NextToken(), "(") == 0)
+	DISPROVE_CHECK(strcmp(tp.NextToken(), "other") == 0)
+	DISPROVE_CHECK(strcmp(tp.NextToken(), ")") == 0)
+	DISPROVE_CHECK(*(tp.NextToken()) == '\0')
+	tp.StopParsing(); //not necessary here, necessary if you exit intermittently
+	DISPROVE_CHECK(teststr == ctrl);
+	
+	teststr = "x + ( a*b ) ok";
+	const String ctrl2(teststr);
+	tp.BeginParsing(teststr.RawMemory());
+	DISPROVE_CHECK(strcmp(tp.NextToken(), "x") == 0)
+	DISPROVE_CHECK(strcmp(tp.NextToken(), "+") == 0)
+	DISPROVE_CHECK(strcmp(tp.NextToken(), "(") == 0)
+	DISPROVE_CHECK(strcmp(tp.NextToken(), "a") == 0)
+	DISPROVE_CHECK(strcmp(tp.NextToken(), "*") == 0)
+	DISPROVE_CHECK(strcmp(tp.NextToken(), "b") == 0)
+	DISPROVE_CHECK(strcmp(tp.NextToken(), ")") == 0)
+	DISPROVE_CHECK(strcmp(tp.NextToken(), "ok") == 0)
+	DISPROVE_CHECK(*(tp.NextToken()) == '\0')
+	tp.StopParsing(); //not necessary here, necessary if you exit intermittently
+	DISPROVE_CHECK(teststr == ctrl2);
+	
+	fprintf(stdout, "\033[32mTokenParser test passed\033[0m\n");
+	return true;
+}
 template<typename T, typename ...Rest>
 bool TestAll_Impl() {
 	if (!Test<T>()) {
 		//failed test for T
-		fprintf(stderr, "\033[31mFailed Tests\033[0m");
+		fprintf(stderr, "\033[31mFailed Tests\033[0m\n");
 		return false;
 	}
 	if constexpr (sizeof...(Rest) > 0) {
 		return TestAll_Impl<Rest...>();
 	} else {
+		fprintf(stdout, "\033[32mAll Tests Passed!\033[0m\n");
 		return true;
 	}
 }
@@ -163,8 +204,7 @@ int main(int argc, char* argv[]){
 	GetConsoleMode(hOutput, &dwMode);
 	dwMode |= ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING;
 	if (!SetConsoleMode(hOutput, dwMode)) {
-		perror("SetConsoleMode failed.");
-		return 1;
+		perror("SetConsoleMode failed."); //even this gets hit on some systems
 	}
 #endif
 	if (TestAll<	String, 
@@ -172,7 +212,8 @@ int main(int argc, char* argv[]){
 			Array<int, 10>, 
 			ArrayMap<10, int, String>, 
 			File, 
-			LogicSequence<int, 10>
+			LogicSequence<int, 10>,
+			TokenParser
 		   >()) {
 		return 0;
 	}

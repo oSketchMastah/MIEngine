@@ -1,0 +1,27 @@
+language: cpp
+jobs:
+  include:
+    - os: linux
+      arch: arm64
+      env: OS=arm64_linux
+    - os: linux
+      arch: amd64
+      env: OS=amd64_linux
+    - os: windows
+      arch: amd64
+      env: OS=windows
+
+branches:
+  only:
+    - main
+
+script:
+    - cd scripts
+    - if [[ ${TRAVIS_OS_NAME} == "windows" ]]; then
+        cd WIN
+        call CompileNTest.bat
+      else
+        cd LINUX
+        ./CompileNTest
+      fi
+      

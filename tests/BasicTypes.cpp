@@ -6,9 +6,14 @@
 #include "MIAssert.h"
 #include "MIFile.h"
 
+#include "MIRawParser.h"
+#include "MIBank.h"
+#include "MIBankString.h"
+#include "MIRange.h"
+
 #include "MILogicSequence.h"
 #include "MIDetectionTests.h"
-
+#include "MIStringUtils.h"
 #include <iostream>
 
 using namespace MI;
@@ -132,11 +137,73 @@ bool Test<LogicSequence<int, 10>>() {
 	return true;
 }
 
+template <>
+bool Test<RawParser>() {
+	RawParser parser;
+	String teststr = "a +b*( 10 + y)";
+	parser.BeginParsing(teststr.RawMemory());
+	parser.IsAtValue('a');
+	DISPROVE_CHECK(parser.IsAtValue('a'))
+	parser.SkipSeq('a', ' ');
+	DISPROVE_CHECK(parser.IsAtValue('+'))
+	parser.SkipAny('+', 'b', '*', '(');
+	DISPROVE_CHECK(parser.IsAtValue(' '))
+	parser.Skip(' ');
+	DISPROVE_CHECK(parser.IsAtValue('1'))
+	parser.MarkIsolationPoint();
+	parser.Skip(Range{'0', '9'});
+	String isotestv = parser.IsolateHere();
+	DISPROVE_CHECK(isotestv == "10");
+	parser.UnIsolate();
+	parser.SkipSeq(' ', '+', ' ');
+	DISPROVE_CHECK(*parser == 'y');
+	parser++;
+	DISPROVE_CHECK(*parser == ')');
+	
+	fprintf(stdout, "\033[32mRawParser test passed\033[0m\n");
+	return true;
+}
+
+void BankAllocString(Bank& bank, const char* str) {
+	size_t rawlen = strlen(str) + 1;
+	char * alloc_str = bank.Allocate<char>(rawlen);
+	strcpy(alloc_str, rawlen, str);
+}
+template <>
+bool Test<Bank>() {
+	Bank b;
+	b.Initialize(4096);
+	BankAllocString(b, "henlo frends");
+	String testv = "henlo frends";
+	DISPROVE_CHECK(testv == reinterpret_cast<char*>(b.bank))
+	fprintf(stdout, "\033[32mBank test passed\033[0m\n");
+	return true;
+}
+
+template <>
+bool Test<BankString>() {
+	Bank bank;
+	bank.Initialize(4096);
+	BankString bankstring;
+	bankstring.Initialize(bank, "henlo frends");
+	
+	String testv = "henlo frends";
+	DISPROVE_CHECK(bankstring == testv.c_str())
+	
+	String testv2 = "henlo again";
+	BankString bankstr2;
+	bankstr2.Initialize(bank, "henlo again");
+
+	DISPROVE_CHECK(bankstring == testv.c_str() && bankstr2 == testv2);
+	
+	fprintf(stdout, "\033[32mBankString test passed\033[0m\n");
+	return true;
+}
+
 template<typename T, typename ...Rest>
 bool TestAll_Impl() {
 	if (!Test<T>()) {
 		//failed test for T
-		fprintf(stderr, "\033[31mFailed Tests\033[0m");
 		return false;
 	}
 	if constexpr (sizeof...(Rest) > 0) {
@@ -172,7 +239,10 @@ int main(int argc, char* argv[]){
 			Array<int, 10>, 
 			ArrayMap<10, int, String>, 
 			File, 
-			LogicSequence<int, 10>
+			LogicSequence<int, 10>,
+			RawParser,
+			Bank,
+			BankString
 		   >()) {
 		return 0;
 	}

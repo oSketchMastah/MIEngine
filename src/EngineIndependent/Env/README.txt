@@ -1,0 +1,1 @@
+This directory has tools that make up the overall environment of the Engine. For instance some things to find here would be components of the debug logging system, or different types of io components.

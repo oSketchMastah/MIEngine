@@ -1,0 +1,6 @@
+SET(MREL "${MREL}/Memory")
+
+list(APPEND SOURCE_EXE ${MREL}/MIBank.cpp ${MREL}/MIBankString.cpp)
+
+SET(SOURCE_EXE ${SOURCE_EXE} PARENT_SCOPE)
+

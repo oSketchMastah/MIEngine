@@ -34,7 +34,6 @@ template <typename T1, typename T2 = T1>
 struct ComparisonTester {
 	bool testedForward = false; //flag to know when to test backwards
 	bool Test(T1 obj1, T2 obj2, Assertion assert) {
-		bool result = true;
 		if (assert == Assertion::Equal) {
 			if constexpr (EqDefined<T1, T2>) {
 				DISPROVE_CHECK(obj1 == obj2)

@@ -8,11 +8,22 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CXX_EXTENSIONS NO)
 
 SET(SOURCE_EXE)
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fconcepts")
-
+endif()
+if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall") #no support for -fconcepts flag, hoping it is built-in now
+endif()
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fconcepts")
+endif()
 include_directories(include/EngineIndependent)
+include_directories(include/EngineIndependent/BasicTypes)
 include_directories("include/EngineIndependent/Free Helpers")
+include_directories(include/EngineIndependent/Env)
+include_directories(include/EngineIndependent/Memory)
 include_directories(include/EngineIndependent/Templates)
+include_directories(include/EngineIndependent/Parsers)
 include_directories(include/EngineTesting)
 
 

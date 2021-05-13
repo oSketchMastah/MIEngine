@@ -1,0 +1,8 @@
+SET(MREL ${MREL}/Parsers)
+
+
+list(APPEND SOURCE_EXE ${MREL}/MIRawParser.cpp)
+
+
+SET(SOURCE_EXE ${SOURCE_EXE} PARENT_SCOPE)
+

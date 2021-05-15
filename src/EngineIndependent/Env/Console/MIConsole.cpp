@@ -15,8 +15,8 @@ int Console::Initialize(const int bufsize) {
 	DWORD dwMode;
 	GetConsoleMode(hOutput, &dwMode);
 	dwMode |= ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-	if (!SetConsoleMode(hOutput, dwMode)) {
-		perror("SetConsoleMode failed.");
+	if (SetConsoleMode(hOutput, dwMode) == 0) {
+		fprintf(stdout, "\033[31m%s\033[0m\n", "SetConsoleMode Failed");
 		return 1;
 	}
 #endif

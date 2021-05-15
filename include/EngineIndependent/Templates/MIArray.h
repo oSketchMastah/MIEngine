@@ -37,6 +37,16 @@ namespace MI {
 			}
 			m_size += offset;
 		}
+		void Remove(T* elm) {
+			for (T* temp = elm; temp < m_size - 1 ; temp++) {
+				*temp = *(temp + 1);
+			}
+			m_size--;
+			*(m_arr + m_size) = T{};
+		}
+		void Remove(int index) {
+			Remove(&m_arr[index]);
+		}
 
 		void inline AddEnd(const T& elm) {
 			m_arr[m_size] = elm;

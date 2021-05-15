@@ -1,7 +1,8 @@
 #include "MIString.h"
 #include "MIVector.h"
 #include "MIArray.h"
-#include "MIMap.h"
+#include "MIArrayMap.h"
+#include "MISymbolBank.h"
 
 #include "MIAssert.h"
 #include "MIFile.h"
@@ -165,7 +166,7 @@ bool Test<RawParser>() {
 }
 
 void BankAllocString(Bank& bank, const char* str) {
-	size_t rawlen = MI::strlen(str) + 1;
+	size_t rawlen = strlen(str) + 1;
 	char * alloc_str = bank.Allocate<char>(rawlen);
 	strcpy(alloc_str, rawlen, str);
 }
@@ -175,28 +176,26 @@ bool Test<Bank>() {
 	b.Initialize(4096);
 	BankAllocString(b, "henlo frends");
 	String testv = "henlo frends";
-	DISPROVE_CHECK(testv == reinterpret_cast<char*>(b.bank))
+	DISPROVE_CHECK(testv == reinterpret_cast<char*>(b.GetBank()))
 	fprintf(stdout, "\033[32mBank test passed\033[0m\n");
 	return true;
 }
 
 template <>
 bool Test<BankString>() {
-	Bank bank;
+	SymbolBank bank;
 	bank.Initialize(4096);
-	BankString bankstring;
-	bankstring.Initialize(bank, "henlo frends");
-	
+	BankString bankstring = bank.Allocate("henlo frends");
+
 	String testv = "henlo frends";
 	DISPROVE_CHECK(bankstring == testv.c_str())
 	
 	String testv2 = "henlo again";
-	BankString bankstr2;
-	bankstr2.Initialize(bank, "henlo again");
+	BankString bankstr2 = bank.Allocate("henlo again");
 
 	DISPROVE_CHECK(bankstring == testv.c_str() && bankstr2 == testv2);
 	
-	fprintf(stdout, "\033[32mBankString test passed\033[0m\n");
+	fprintf(stdout, "\033[32mSymbolBank/BankString test passed\033[0m\n");
 	return true;
 }
 
@@ -218,23 +217,12 @@ bool TestAll() {
 	return TestAll_Impl<Types...>();
 }
 
-//this and the part before the tests setting up ansi-sequence interpretation should be abstracted out eventually
-#if defined( WIN32 ) || defined(WIN64)
-#include <Windows.h>
-#endif
+#include "MIConsole.h"
+
 
 int main(int argc, char* argv[]){
-#if defined( WIN32 ) || defined(WIN64)
-	HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-	DWORD dwMode;
-	GetConsoleMode(hOutput, &dwMode);
-        dwMode |= ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-        SetConsoleMode(hOutput, dwMode);
-        /*if (!SetConsoleMode(hOutput, dwMode)) {
-		perror("SetConsoleMode failed.");
-		return 1;
-        }*/
-#endif
+	Console::Initialize();
+	
 	if (TestAll<	String, 
 			Vector<char>, 
 			Array<int, 10>, 

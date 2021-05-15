@@ -13,9 +13,9 @@ namespace MI {
 		//Specify as | product of flags, Ex.  File::Mode::IN | File::Mode::OUT | File::Mode::BIN opens for binary input + output
 
 		//setup buffer, and attach it to a file stream (if one is given to constructor)
-		File(const int bufcap = 16384);
-		File(const char* filename, const FMode& mode, const int bufcap = 16384);
-		File(const String& cfile, const int bufcap = 16384);
+		File(const int bufcap = 16385);
+		File(const char* filename, const FMode& mode, const int bufcap = 16385);
+		File(const String& cfile, const int bufcap = 16385);
 		File(File&& other); //move the resource from other file to this one
 		~File();
 

@@ -165,7 +165,7 @@ bool Test<RawParser>() {
 }
 
 void BankAllocString(Bank& bank, const char* str) {
-	size_t rawlen = strlen(str) + 1;
+	size_t rawlen = MI::strlen(str) + 1;
 	char * alloc_str = bank.Allocate<char>(rawlen);
 	strcpy(alloc_str, rawlen, str);
 }

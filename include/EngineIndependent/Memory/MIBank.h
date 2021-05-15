@@ -4,7 +4,13 @@ namespace MI {
 //stores Bank types, ie. Allocate things here if you want them to be stored for the same duration as the Bank
 //	make sure you're not using types that delete their data (ie. no dynamic types).
 	struct Bank {
+#if defined(WIN32) || defined(WIN64)
+		//because windows can't handle some standards
+		void* allocbank;
 		void * bank;
+#else
+		void* bank;
+#endif
 		void * end;
 
 		//allocates an aligned bank of memory

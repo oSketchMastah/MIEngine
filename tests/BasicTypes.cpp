@@ -228,11 +228,12 @@ int main(int argc, char* argv[]){
 	HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
 	DWORD dwMode;
 	GetConsoleMode(hOutput, &dwMode);
-	dwMode |= ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-	if (!SetConsoleMode(hOutput, dwMode)) {
+        dwMode |= ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+        SetConsoleMode(hOutput, dwMode);
+        /*if (!SetConsoleMode(hOutput, dwMode)) {
 		perror("SetConsoleMode failed.");
 		return 1;
-	}
+        }*/
 #endif
 	if (TestAll<	String, 
 			Vector<char>, 

@@ -3,8 +3,14 @@
 namespace MI {
 	class SymbolBank {
 	protected:
-		void * bank;
-		void * end;
+#if defined(WIN32) || defined(WIN64)
+		//because windows can't handle some standards
+		void* allocbank;
+		void* bank;
+#else
+		void* bank;
+#endif
+		void* end;
 	public:
 		//allocates an aligned bank of memory
 		void Initialize(int bytesize, int bytealign = BYTEALIGN);

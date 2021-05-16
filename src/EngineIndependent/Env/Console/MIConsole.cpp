@@ -33,7 +33,7 @@ void Console::UnblockInput() {
 
 //check the input for a character (for use in unblocked mode)
 char Console::CheckInput() {
-
+	return '\0';
 }
 	
 //blocks input. (this is the default, but probably should be used sometime after UnblockInput)
@@ -41,11 +41,11 @@ void Console::BlockInput() {
 
 }
 
-
+/*
 TerminalString& Console::GetInput() {
 
 }
-	
+*/
 //Write a TerminalString to the console
 void Console::Write(const TerminalString& tstr) {
 

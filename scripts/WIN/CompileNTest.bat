@@ -24,3 +24,4 @@ for %%a in ("BasicTypes") do (
      !TEST!.exe
 )
 endlocal
+PAUSE

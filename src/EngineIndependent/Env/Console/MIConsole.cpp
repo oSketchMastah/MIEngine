@@ -1,14 +1,27 @@
 #include "MIConsole.h"
+#include "MIConsoleInput.h"
+#include "MIConsoleOutput.h"
 #include <cstdio>
 
 #if defined( WIN32 ) || defined(WIN64)
 #include <Windows.h>
+#else
+#include <unistd.h>
+#include <termios.h>
 #endif
 
-
 using namespace MI;
+struct Console::Impl {
+	Impl();
+	~Impl() {}
+    ConsoleOutput pout;
+    ConsoleInput pin;
+};
 
-int Console::Initialize(const int bufsize) {
+template<> ConsoleOutput& Console::Get<ConsoleOutput>() { return pImpl->pout; }
+template<> ConsoleInput& Console::Get<ConsoleInput>() { return pImpl->pin; }
+
+int Console::Initialize(const int inbufsize, const int outbufsize) {
 //setup virtual sequence interpretation stuff on windows consoles where it gets disabled
 #if defined( WIN32 ) || defined(WIN64)
 	HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -20,25 +33,14 @@ int Console::Initialize(const int bufsize) {
 		return 1;
 	}
 #endif
-	if (setvbuf(stdout, NULL, _IOFBF, bufsize) != 0) {
-		fprintf(stdout, "\033[31m%s\033[0m\n", "Error setting buffer");
+	if (setvbuf(stdout, NULL, _IOFBF, outbufsize) != 0) {
+		fprintf(stdout, "\033[31m%s\033[0m\n", "Error setting output buffer");
 		return 1;
 	}
-}
-
-//put the console in unblocked input mode (characters can be read the moment they are entered)
-void Console::UnblockInput() {
-
-}
-
-//check the input for a character (for use in unblocked mode)
-char Console::CheckInput() {
-	return '\0';
-}
-	
-//blocks input. (this is the default, but probably should be used sometime after UnblockInput)
-void Console::BlockInput() {
-
+    if (setvbuf(stdout, NULL, _IOLBF, inbufsize) != 0) {
+        fprintf(stdout, "\033[31m%s\033[0m\n", "Error setting input buffer");
+        return 1;
+    }
 }
 
 /*
@@ -46,8 +48,4 @@ TerminalString& Console::GetInput() {
 
 }
 */
-//Write a TerminalString to the console
-void Console::Write(const TerminalString& tstr) {
-
-}
 

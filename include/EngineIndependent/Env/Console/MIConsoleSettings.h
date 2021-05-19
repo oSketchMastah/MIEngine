@@ -12,11 +12,11 @@ namespace MI {
 //might be worth separating these into two derived classes of some ConsoleSettingType class (Input and Output).
 class ConsoleSettings {
 #ifdef WINDOWS
-	inline static struct DWORD init_inmode;
-	inline static struct DWORD curr_inmode;
+	inline static DWORD init_inmode;
+	inline static DWORD curr_inmode;
 	
-	inline static struct DWORD init_outmode;
-	inline static struct DWORD curr_outmode;
+	inline static DWORD init_outmode;
+	inline static DWORD curr_outmode;
 #else
 	inline static struct termios init_inmode;
 	inline static struct termios curr_inmode;
@@ -31,11 +31,11 @@ public:
 	static void Initialize();
 	
 #ifdef WINDOWS
-	static int DisjunctInputFlags(__in__ DWORD flags);
-	static int ConjunctInputFlags(__in__ DWORD flags);
+	static int DisjunctInputFlags(DWORD flags);
+	static int ConjunctInputFlags(DWORD flags);
 	
-	static int DisjunctOutputFlags(__in__ DWORD flags);
-	static int ConjunctOutputFlags(__in__ DWORD flags);
+	static int DisjunctOutputFlags( DWORD flags);
+	static int ConjunctOutputFlags( DWORD flags);
 #else
 	static int DisjunctInputFlags(tcflag_t flags);
 	static int ConjunctInputFlags(tcflag_t flags);

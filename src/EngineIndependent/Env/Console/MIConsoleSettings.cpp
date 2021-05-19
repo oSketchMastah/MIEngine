@@ -38,28 +38,28 @@ int ConsoleSettings::Restore() {
 */
 
 #ifdef WINDOWS
-	int ConsoleSettings::DisjunctInputFlags(__in__ DWORD flags) {
+	int ConsoleSettings::DisjunctInputFlags( DWORD flags) {
 		HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
 		GetConsoleMode(hIn, &curr_inmode);
 		curr_inmode |= flags;
 		return (SetConsoleMode(hIn, curr_inmode) == 0) ? -1 : 0;
 	}
 	
-	int ConsoleSettings::ConjunctInputFlags(__in__ DWORD flags) {
+	int ConsoleSettings::ConjunctInputFlags( DWORD flags) {
 		HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
 		GetConsoleMode(hIn, &curr_inmode);
 		curr_inmode &= flags;
 		return (SetConsoleMode(hIn, curr_inmode) == 0) ? -1 : 0;
 	}
 	
-	int ConsoleSettings::DisjunctOutputFlags(__in__ DWORD flags) {
+	int ConsoleSettings::DisjunctOutputFlags( DWORD flags) {
 		HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
 		GetConsoleMode(hOut, &curr_outmode);
 		curr_outmode |= flags;
 		return (SetConsoleMode(hOut, curr_outmode) == 0) ? -1 : 0;
 	}
 	
-	int ConsoleSettings::ConjunctOutputFlags(__in__ DWORD flags) {
+	int ConsoleSettings::ConjunctOutputFlags( DWORD flags) {
 		HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
 		GetConsoleMode(hOut, &curr_outmode);
 		curr_outmode &= flags;

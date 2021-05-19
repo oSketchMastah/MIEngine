@@ -21,7 +21,11 @@ struct Console {
 	//ConsoleInput&	Get<ConsoleInput>();
 
 	//Sets up the console, might include installing our own buffer in the current terminal, setting up virtual sequence interpretation (in windows)
-	static int Initialize(const int inbufsize = 512, const int outbufsize = 16385);
+	#ifdef WINDOWS
+		static int Initialize(const int inbufsize = -1, const int outbufsize = 16385);
+	#else //Everything else probably does a good job with default output buffer (-1 means do nothing)
+		static int Initialize(const int inbufsize = -1, const int outbufsize = -1);
+	#endif
 private:
 	struct Impl;
 	UniquePtr<Impl> pImpl;

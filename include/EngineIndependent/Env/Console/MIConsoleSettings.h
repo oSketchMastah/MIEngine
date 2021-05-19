@@ -26,7 +26,8 @@ class ConsoleSettings {
 #endif
 
 public:
-	static int Restore();
+	//On Linux, Restore is always failing (todo: fix this, put in destructor of Console)
+	//static int Restore();
 	static void Initialize();
 	
 #ifdef WINDOWS

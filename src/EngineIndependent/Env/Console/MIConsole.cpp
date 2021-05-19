@@ -22,19 +22,17 @@ template<> ConsoleInput& Console::Get<ConsoleInput>() { return pImpl->In; }
 //template<> ConsoleSettings& Console::Get<ConsoleSettings>() { return pImpl->Settings; }
 
 Console::~Console() {
-	if (ConsoleSettings::Restore() != 0) { 
+	/*if (ConsoleSettings::Restore() != 0) { 
 		fprintf(stdout, "\033[31m%s\033[0m\n", "Failed to restore terminal settings");
-	}
+	}*/
 }
 
 int Console::Initialize(const int inbufsize, const int outbufsize) {
-	ConsoleSettings::Initialize();
-	
-	/*if (setvbuf(stdout, NULL, _IOFBF, outbufsize) != 0) {
+	if (outbufsize != -1 && setvbuf(stdout, NULL, _IOFBF, outbufsize) != 0) {
 		fprintf(stdout, "\033[31m%s\033[0m\n", "Error setting output buffer");
 		return 1;
-	}*/
-    	if (setvbuf(stdout, NULL, _IOLBF, inbufsize) != 0) {
+	}
+    	if (inbufsize != -1 && setvbuf(stdin, NULL, _IOLBF, inbufsize) != 0) {
         	fprintf(stdout, "\033[31m%s\033[0m\n", "Error setting input buffer");
        	 return 1;
    	}
@@ -45,15 +43,6 @@ int Console::Initialize(const int inbufsize, const int outbufsize) {
 		fprintf(stdout, "\033[31m%s\033[0m\n", "SetConsoleMode failed on adding flags ENABLE_PROCESSED_OUTPUT, and ENABLE_VIRTUAL_TERMINAL_PROCESSING");
 		return 1;
 	}
-	/*
-	HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-	DWORD dwMode;
-	GetConsoleMode(hOutput, &dwMode);
-	dwMode |= ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-	if (SetConsoleMode(hOutput, dwMode) == 0) {
-		fprintf(stdout, "\033[31m%s\033[0m\n", "SetConsoleMode Failed");
-		return 1;
-	}*/
 #endif
 }
 

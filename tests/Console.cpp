@@ -4,28 +4,20 @@
 #include <stdio.h>
 using namespace MI;
 int main() {
+
 	Console::Initialize();
 	Console cons;
 	ConsoleInput& cin = cons.Get<ConsoleInput>();
 	ConsoleOutput& cout = cons.Get<ConsoleOutput>();
-	cin.UnblockInput();
-	char c;
-
 	
-	for (int i = -1; (c = cin.CheckInput()) == '\0';
-#ifdef WINDOWS
-		i = (i + 1)%100000) {
-#else
-		i = (i + 1)%10000000) { //Linux is about 100x faster than windows, right?
-#endif
-		if (i == 0) {
-			cout.Write("hit a key\n");
-			fflush(stdout);
-		}
-	}
-
-
-	
-	fprintf(stdout, "you hit %c\n", c);
 	cin.UnblockInput();
+
+	char c = cin.CheckInput();
+	cout.Write("\033[36mtEsT sTrInG\033[0m\n");
+	
+	cin.BlockInput();
+	
+	cout.Write("\033[35mTeSt StRiNg\033[0m\n");
+	cout.Write("\033[30moH hEy CoOl, \033[31mNeAt\033[0m\n");
+	//fflush(stdout); //absolutely unnecessary for this test, still a useful reference tho.
 }

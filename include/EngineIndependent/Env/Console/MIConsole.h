@@ -12,13 +12,13 @@ struct ConsoleInput;
 */
 
 struct Console {
-	Console() {}
-	~Console() {}
+	Console(){}
+	~Console();
 	//A method for getting access to different components of the console
 	template <typename T>
 	T& Get();
-	template<> ConsoleOutput&	Get<ConsoleOutput>();
-	template<> ConsoleInput&	Get<ConsoleInput>();
+	//ConsoleOutput&	Get<ConsoleOutput>();
+	//ConsoleInput&	Get<ConsoleInput>();
 
 	//Sets up the console, might include installing our own buffer in the current terminal, setting up virtual sequence interpretation (in windows)
 	static int Initialize(const int inbufsize = 512, const int outbufsize = 16385);

@@ -11,8 +11,13 @@ int main() {
 	cin.UnblockInput();
 	char c;
 
-
-	for (int i = -1; (c = cin.CheckInput()) == '\0'; i = (i + 1)%100000) {
+	
+	for (int i = -1; (c = cin.CheckInput()) == '\0';
+#ifdef WINDOWS
+		i = (i + 1)%100000) {
+#else
+		i = (i + 1)%10000000) { //Linux is about 100x faster than windows, right?
+#endif
 		if (i == 0) {
 			cout.Write("hit a key\n");
 			fflush(stdout);

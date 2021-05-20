@@ -111,7 +111,7 @@ struct ComparisonTester {
 };
 
 template <typename T1, typename T2 = T1>
-bool IsLogicallyValid(T1 o1, T2 o2) {
+bool IsLogicallyValid(const T1 o1, const T2 o2) {
 	return !((o1 == o2 && o1 != o2) || (!(o1 == o2) && !(o1 != o2)) || 
 		(o2 == o1 && o2 != o1) || (!(o1 == o2) && !(o1 != o2)));
 }
@@ -119,7 +119,7 @@ bool IsLogicallyValid(T1 o1, T2 o2) {
 
 //order defines relative states. o1 can be less than OR equal to o2, same between o2 and o3.
 template <typename T1, typename T2 = T1, typename T3 = T2>
-bool TriCompare(T1 o1, T2 o2, T3 o3) {
+bool TriCompare(const T1 o1, const T2 o2, const T3 o3) {
 	ComparisonTester<T1, T2> test1;
 	DISPROVE_CHECK(IsLogicallyValid(o1, o2))
 	else if (o1 == o2) {

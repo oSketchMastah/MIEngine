@@ -15,6 +15,8 @@
 #include "MILogicSequence.h"
 #include "MIDetectionTests.h"
 #include "MIStringUtils.h"
+
+#include "MIStringHashMap.h"
 #include <iostream>
 
 using namespace MI;
@@ -193,8 +195,14 @@ bool Test<BankString>() {
 	String testv2 = "henlo again";
 	BankString bankstr2 = bank.Allocate("henlo again");
 
-	DISPROVE_CHECK(bankstring == testv.c_str() && bankstr2 == testv2);
+	DISPROVE_CHECK(bankstring == testv.c_str() && bankstr2 == testv2.c_str());
 	
+	BankString l1 = bank.Allocate("a");
+	BankString b1 = bank.Allocate("b");
+	BankString m1 = bank.Allocate("abc");
+
+	DISPROVE_CHECK(TriCompare<BankString>(l1, m1, b1))
+
 	fprintf(stdout, "\033[32mSymbolBank/BankString test passed\033[0m\n");
 	return true;
 }

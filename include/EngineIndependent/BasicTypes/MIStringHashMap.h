@@ -2,6 +2,7 @@
 #include "MIBank.h"
 #include <stdio.h>
 #include <typeinfo>
+#include <type_traits>
 
 namespace MI {
 	

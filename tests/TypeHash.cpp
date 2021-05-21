@@ -14,12 +14,15 @@ namespace MI {
 
 		static void Initialize() {
 			symbank.Initialize(8192);
-			allocator.Initialize((TYPE_HASH_SIZE + 1) * sizeof(TypeInfo*)); //this could be a bigger allocator used to allocate the hashmap
+			/*This Bank (allocator) will have enough capacity to handle storing the HashMap with TYPE_HASH_SIZE pointers, as well as any and all possible TypeInfo
+			*	Note: you should adjust the value to be somewhat significantly larger than how many TypeInfo objects you plan on storing (reduces collisions).
+			*/
+			allocator.Initialize( (TYPE_HASH_SIZE) * ( sizeof(TypeInfo) + sizeof(TypeInfo*)  ) ); //this could be a bigger allocator used to allocate the hashmap
 			infomap.Initialize(allocator);
 		}
 		static void RegisterClass(const char* name) {
 			TypeInfo* pinfo = allocator.Allocate<TypeInfo>();
-			pinfo->name = BankString{ symbank.Allocate(name) };
+			pinfo->name = symbank.Allocate(name);
 			infomap.Register(name, pinfo);
 		}
 
@@ -53,10 +56,8 @@ bool Test() {
 
 int main(int argc, char* argv[]) {
 	Console::Initialize();
-
 	if (Test()) {
 		return 0;
 	}
-
 	return 1;
 }

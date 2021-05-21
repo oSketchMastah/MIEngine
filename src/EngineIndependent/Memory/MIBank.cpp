@@ -11,6 +11,7 @@ void Bank::Initialize(int bytesize, int bytealign) {
 #else
 	bank = aligned_alloc(bytealign, bytesize);
 #endif
+	cap = bytesize + (bytealign - bytesize % bytealign);
 	end = bank;
 }
 

@@ -1,0 +1,7 @@
+SET(MREL ${MREL}/InterpreterEngine)
+
+
+list(APPEND SOURCE_EXE ${MREL}/MISymbolBank.cpp)
+
+
+SET(SOURCE_EXE ${SOURCE_EXE} PARENT_SCOPE)

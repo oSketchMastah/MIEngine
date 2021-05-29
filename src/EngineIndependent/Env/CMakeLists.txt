@@ -1,5 +1,6 @@
 SET(MREL ${MREL}/Env)
 
+add_subdirectory(Console)
 list(APPEND SOURCE_EXE ${MREL}/MILogger.cpp)
 
 

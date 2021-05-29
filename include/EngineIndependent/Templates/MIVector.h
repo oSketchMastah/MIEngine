@@ -42,7 +42,13 @@ namespace MI {
 			*(data + numElements) = obj;
 			numElements++;
 		}
-
+		void ShiftRemoveIndex(const int i)  {
+			for(T* pdata = data + i; pdata < pdata + numElements - 1; pdata++) {
+				*pdata = *(pdata + 1);
+			}
+			numElements--;
+			*(data + numElements) = T{};
+		}
 		const T& operator[](const int i) const {
 			return data[i];
 		}

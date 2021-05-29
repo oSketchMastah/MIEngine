@@ -1,10 +1,10 @@
 #pragma once
 namespace MI {
 	//A UniquePtr class that works with incomplete types, 
-	//   ie. this should not need to know anything specific about T, it's just a heap object
+	//   ie. this should not need to know anything specific about T (at least until implementation), it's just a heap object
 	template <typename T>
 	struct UniquePtr {
-		UniquePtr() { m_pObj = new T; }
+		UniquePtr() { m_pObj = nullptr; }
 		UniquePtr(T* pObj) { m_pObj = pObj; }
 		~UniquePtr() { delete m_pObj; }
 

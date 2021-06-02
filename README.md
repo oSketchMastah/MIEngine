@@ -3,8 +3,9 @@
 
 A collection of types and C++ code that helps.
 
-Works on Linux and Windows. 
-Uses concepts from C++20 standard in at least a few things (see MIDetectionTesting.h for an example), otherwise uses many features from C++17.
+Everything is tested to work on Linux and Windows.
+
+Uses concepts from C++20 standard in at least a few things (see MIDetectionTesting.h for an example), otherwise many features from C++17 are used through-out.
 
 To run the tests in the tests directory yourself:
   1. make sure you have cmake downloaded and installed.
